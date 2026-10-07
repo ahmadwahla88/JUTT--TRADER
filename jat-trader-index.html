@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jat Trader - Online Order</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f4faf5;color:#17351f}
+header{background:#16833b;color:#fff;padding:22px 16px;text-align:center;box-shadow:0 2px 8px #0002}
+header h1{margin:0 0 6px;font-size:30px}
+header p{margin:0;font-size:15px}
+.container{max-width:900px;margin:22px auto;padding:0 14px}
+.products{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.card{background:#fff;border-radius:16px;padding:15px;box-shadow:0 3px 12px #0001}
+.card img{width:100%;height:190px;object-fit:cover;border-radius:12px;background:#eef5ef}
+.card h2{font-size:19px;margin:12px 0 6px}
+.price{font-size:20px;font-weight:bold;color:#16833b;margin-bottom:12px}
+.qty{display:flex;align-items:center;justify-content:center;gap:15px}
+.qty button{width:40px;height:40px;border:0;border-radius:50%;background:#16833b;color:#fff;font-size:23px;cursor:pointer}
+.qty span{font-size:20px;font-weight:bold;min-width:25px;text-align:center}
+.order{margin-top:22px;background:#fff;border-radius:16px;padding:18px;box-shadow:0 3px 12px #0001}
+.order h2{margin-top:0}
+#summary{white-space:pre-line;line-height:1.8;background:#f4faf5;padding:12px;border-radius:10px;min-height:50px}
+.total{font-size:21px;font-weight:bold;margin:12px 0}
+.whatsapp{display:block;width:100%;padding:15px;background:#25D366;color:#fff;text-align:center;text-decoration:none;border-radius:10px;font-size:18px;font-weight:bold;border:0;cursor:pointer}
+.note{text-align:center;color:#607565;font-size:13px;margin:14px 0 30px}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Jat Trader</h1>
+  <p>آن لائن آرڈر کریں — WhatsApp پر بھیجیں</p>
+</header>
+
+<div class="container">
+  <div class="products" id="products"></div>
+
+  <div class="order">
+    <h2>آپ کا آرڈر</h2>
+    <div id="summary">ابھی کوئی پروڈکٹ منتخب نہیں کی گئی۔</div>
+    <div class="total">کل رقم: Rs. <span id="total">0</span></div>
+    <a id="send" class="whatsapp" href="#" target="_blank">📲 WhatsApp پر آرڈر بھیجیں</a>
+  </div>
+
+  <div class="note">Jat Trader — پروڈکٹ اور قیمتیں آپ بعد میں آسانی سے تبدیل کر سکتے ہیں۔</div>
+</div>
+
+<script>
+const WHATSAPP = "923114384895";
+
+const products = [
+  {
+    name: "National Ketchup",
+    price: 420,
+    image: "https://via.placeholder.com/600x450?text=National+Ketchup"
+  },
+  {
+    name: "Rose Petal Tissue",
+    price: 0,
+    image: "https://via.placeholder.com/600x450?text=Rose+Petal+Tissue"
+  },
+  {
+    name: "Tux Tissue",
+    price: 250,
+    image: "https://via.placeholder.com/600x450?text=Tux+Tissue"
+  }
+];
+
+const cart = {};
+products.forEach((p,i)=>cart[i]=0);
+
+function render(){
+  document.getElementById("products").innerHTML = products.map((p,i)=>`
+    <div class="card">
+      <img src="${p.image}" alt="${p.name}">
+      <h2>${p.name}</h2>
+      <div class="price">${p.price ? "Rs. "+p.price : "قیمت درج کریں"}</div>
+      <div class="qty">
+        <button onclick="changeQty(${i},-1)">−</button>
+        <span id="q${i}">0</span>
+        <button onclick="changeQty(${i},1)">+</button>
+      </div>
+    </div>
+  `).join("");
+  updateOrder();
+}
+
+function changeQty(i,n){
+  cart[i]=Math.max(0,cart[i]+n);
+  document.getElementById("q"+i).textContent=cart[i];
+  updateOrder();
+}
+
+function updateOrder(){
+  let lines=[], total=0;
+  products.forEach((p,i)=>{
+    if(cart[i]>0){
+      let amount=p.price*cart[i];
+      lines.push(`${p.name} × ${cart[i]} = Rs. ${amount}`);
+      total+=amount;
+    }
+  });
+
+  document.getElementById("summary").textContent =
+    lines.length ? lines.join("\n") : "ابھی کوئی پروڈکٹ منتخب نہیں کی گئی۔";
+  document.getElementById("total").textContent=total.toLocaleString();
+
+  let message = lines.length
+    ? `Jat Trader Order%0A%0A${encodeURIComponent(lines.join("\n"))}%0A%0Aکل رقم: Rs. ${total}`
+    : "Jat Trader میں آرڈر دینا چاہتا ہوں۔";
+
+  document.getElementById("send").href =
+    `https://wa.me/${WHATSAPP}?text=${message}`;
+}
+render();
+</script>
+</body>
+</html>
